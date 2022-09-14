@@ -1,9 +1,11 @@
 (ns gaia.core
   (:require [clojure.core.async :as a]
             [discljord.messaging :as m]
-            [discljord.connections :as c]))
+            [discljord.connections :as c]
+            [dotenv]))
 
-(def token      "ODE0MTkwNzY0MTQxNDQ1MTIx.Gg3cd4.HDZUw0AKAJ4MQN5m-ZbtQpFcqCt-0UiUXO5VC4")
+(def token      (dotenv/env "DISCORD_TOKEN"))
+token
 (def intents    #{:guilds :guild-messages})
 (def channel-id "1018526450254626841")
 
@@ -16,12 +18,13 @@
   command-to-response
   )
 
+(defn send-msg [message-ch channel-id content]
+  (m/create-message! message-ch channel-id :content content))
+
 (defn respond-to [message-ch channel-id message]
   (if (command-to-response message)
     (send-msg message-ch channel-id (command-to-response message))))
 
-(defn send-msg [message-ch channel-id content]
-  (m/create-message! message-ch channel-id :content content))
 
 (defn -main []
   (let [event-ch      (a/chan 100)
